@@ -2,16 +2,54 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 
+
+UserData = {
+        "admin":"1111"}
+
+
 # Function to validate login
 def validate_login():
     username = username_entry.get()
     password = password_entry.get()
 
-    if username == "user" and password == "password":
-        messagebox.showinfo("Login Successful", "Welcome!")
+    if username in UserData:
+        if UserData[username] == password:
+            messagebox.showinfo("Login Successful", "Welcome!")
+        else:
+            messagebox.showerror("Login Failed", "Password wrong!")
+            username_entry.delete(0, tk.END)
+            password_entry.delete(0, tk.END)
+            return False
     else:
         messagebox.showerror("Login Failed", "Invalid username or password")
+        username_entry.delete(0, tk.END)
+        password_entry.delete(0, tk.END)
+        return False
+        
+    username_entry.delete(0, tk.END)
+    password_entry.delete(0, tk.END)
+    
 
+def add_user():
+    username = username_entry.get()
+    password = password_entry.get()
+    
+    if(username.strip() != "" and password.strip() != ""):
+        if username not in UserData:
+            UserData[username] = password
+            messagebox.showinfo("Auth successful!","Welcome!")
+        else:
+            messagebox.showerror("User exist","Try again")
+            username_entry.delete(0, tk.END)
+            password_entry.delete(0, tk.END)
+            return False
+            
+    username_entry.delete(0, tk.END)
+    password_entry.delete(0, tk.END)
+    
+    
+
+            
 # Create main window
 root = tk.Tk()
 root.title("Login App")
@@ -41,6 +79,9 @@ password_entry.grid(row=2, column=1, pady=5)
 # Create and place login button
 login_button = ttk.Button(login_frame, text="Login", command=validate_login)
 login_button.grid(row=3, column=0, columnspan=2, pady=20)
+
+auth_button = ttk.Button(login_frame, text="Auth", command=add_user)
+auth_button.grid(row=4, column=0, columnspan=2, pady=20)
 
 # Start the main event loop
 root.mainloop()

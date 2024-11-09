@@ -39,9 +39,11 @@ def open_next_page(username, root):
     # List to store the last three warning values
     warning_sequence = []
     screen_locked = False
+    lock_window = None  # Initialize lock_window as None
 
     # Function to lock the entire screen
     def lock_screen():
+        nonlocal lock_window  # Use nonlocal to modify lock_window in the outer scope
         lock_window = tk.Toplevel()
         lock_window.attributes("-fullscreen", True)
         lock_window.configure(bg="black")
@@ -54,12 +56,13 @@ def open_next_page(username, root):
         # Disable keyboard and mouse input
         ctypes.windll.user32.BlockInput(True)
 
-        return lock_window
-
     # Function to unlock the screen
-    def unlock_screen(lock_window):
-        lock_window.destroy()
-        ctypes.windll.user32.BlockInput(False)
+    def unlock_screen():
+        nonlocal lock_window  # Use nonlocal to access lock_window
+        if lock_window is not None:  # Check if lock_window is created
+            lock_window.destroy()
+            lock_window = None
+            ctypes.windll.user32.BlockInput(False)
 
     # Function to change the element with a generated value
     def change_elem():
@@ -93,7 +96,7 @@ def open_next_page(username, root):
                 # If we have three warnings in sequence, lock the screen
                 if len(warning_sequence) == 3:
                     screen_locked = True
-                    lock_window = lock_screen()  # Lock the screen
+                    lock_screen()  # Lock the screen
 
             # If the value is 0, reset the warning sequence
             elif value == 0:
@@ -102,7 +105,7 @@ def open_next_page(username, root):
             # If screen is locked and receives 0, unlock
             if screen_locked and value == 0:
                 screen_locked = False
-                unlock_screen(lock_window)
+                unlock_screen()
                 warning_sequence.clear()
                 messagebox.showinfo("Screen Unlocked", "Screen has been unlocked.")
 

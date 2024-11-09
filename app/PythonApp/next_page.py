@@ -4,7 +4,11 @@ import threading
 import ctypes  # For controlling system functions
 import generateData
 import notification
+import UserBlockCase
 
+
+
+random_gen = generateData.RandomNumberGenerator()
 # Function that opens the next page after login
 def open_next_page(username, root):
     root.destroy()
@@ -54,7 +58,8 @@ def open_next_page(username, root):
         lock_label.place(relx=0.5, rely=0.5, anchor="center")
 
         # Disable keyboard and mouse input
-        ctypes.windll.user32.BlockInput(True)
+        # ctypes.windll.user32.BlockInput(True)
+        UserBlockCase.blockinput()
 
     # Function to unlock the screen
     def unlock_screen():
@@ -62,11 +67,13 @@ def open_next_page(username, root):
         if lock_window is not None:  # Check if lock_window is created
             lock_window.destroy()
             lock_window = None
-            ctypes.windll.user32.BlockInput(False)
+            # ctypes.windll.user32.BlockInput(False)
+            UserBlockCase.unblockinput()
 
     # Function to change the element with a generated value
     def change_elem():
-        my_val.set(str(generateData.generate_random_numbers()))
+        # my_val.set(str(generateData.generate_random_numbers()))
+        my_val.set(str(random_gen.generate_random_number()))
         threading.Thread(target=show_notification_in_thread).start()
         next_page_window.after(10000, change_elem)  # Schedule the next update
 
@@ -107,7 +114,7 @@ def open_next_page(username, root):
                 screen_locked = False
                 unlock_screen()
                 warning_sequence.clear()
-                messagebox.showinfo("Screen Unlocked", "Screen has been unlocked.")
+                # messagebox.showinfo("Screen Unlocked", "Screen has been unlocked.")
 
         except ValueError:
             pass  # Handle cases where my_val is not an integer

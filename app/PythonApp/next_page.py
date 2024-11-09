@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-import generateData  # Make sure this module has the `generate_random_numbers` function
+import threading  # For handling the notification in a separate thread
+import generateData  # Your generateData module with the function
 import notification
 
 # Function that opens the next page after login
@@ -36,14 +37,18 @@ def open_next_page(username, root):
 
     # Function to change the element with a generated value
     def change_elem():
-        
         my_val.set(str(generateData.generate_random_numbers()))
-        notification.send_notification("Test Title", "This is a test message")
-        # print(my_val)
+        threading.Thread(target=show_notification_in_thread).start()
         next_page_window.after(10000, change_elem)  # Schedule the next update
 
     # Start updating the value label after 10 seconds
     next_page_window.after(10000, change_elem)
 
-    # Run the Tkinter main event loop
+    # Start the notification in a separate thread to avoid blocking Tkinter main loop
+    def show_notification_in_thread():
+        notification.send_notification("Test Title", "You have logged in successfully!")
+    
+
+
+    # Run the Tkinter main loop
     next_page_window.mainloop()

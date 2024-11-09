@@ -1,9 +1,20 @@
 import cv2
 import mediapipe as mp
+import math
 
 # Initialize MediaPipe Pose and Drawing modules
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
+
+params = {
+    "Head Ratio" : 0.0,
+    "Head Tilt" : 0.0,
+    "Shoulders Tilt": 0.0,
+    "Neck Tilt" : 0.0,
+    "Spine Tilt" : 0.0,
+    "Neck Ratio" : 0.0,
+    "Spine Ratio" : 0.0
+}
 
 # Function to extract and draw keypoints
 def extract_and_draw_keypoints(image, pose):
@@ -64,10 +75,25 @@ def extract_and_draw_keypoints(image, pose):
     draw_line((points["Right Shoulder"].x, points["Right Shoulder"].y), neck_point, color=(0, 0, 255), thickness=2)  # Blue line
     draw_line((points["Left Shoulder"].x, points["Left Shoulder"].y), neck_point, color=(0, 0, 255), thickness=2)  # Blue line
 
-    return image
+    return image, points
+
+def point_distance(x:tuple, y:tuple)->float:
+    return math.sqrt((x[1]-x[0])**2 + (y[1]-y[0])**2)
 
 # Start capturing video from the webcam
 cap = cv2.VideoCapture(0)
+# Set the resolution (width and height)
+# width = 1280  # Set your desired width
+# height = 720  # Set your desired height
+# cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+# cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+# Check if the resolution was set correctly
+actual_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+actual_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+print(f"Resolution set to: {actual_width} x {actual_height}")
+
+
 
 # Initialize MediaPipe Pose in a context
 with mp_pose.Pose(static_image_mode=False) as pose:
@@ -76,9 +102,24 @@ with mp_pose.Pose(static_image_mode=False) as pose:
         frame = cv2.flip(frame, 1)
         if not ret:
             break
-
+        
         # Process and draw keypoints on the frame
-        annotated_frame = extract_and_draw_keypoints(frame, pose)
+        annotated_frame, pose_points = extract_and_draw_keypoints(frame, pose)
+
+        head_ratio = point_distance((pose_points["Right Eye"].x, pose_points["Left Eye"].x), (pose_points["Right Eye"].y, pose_points["Left Eye"].y))
+        text = f"Head R = {head_ratio}"
+
+        frame_height, frame_width = frame.shape[:2]
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 1
+        color = (255, 255, 255)
+        thickness = 2
+        (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness)
+        x=frame_width - text_width -10
+        y = 10+text_height
+
+        cv2.putText(annotated_frame, text, (x,y), font, font_scale, color, thickness)        
+
 
         # Display the resulting frame
         cv2.imshow("Body Keypoints with Lines", annotated_frame)

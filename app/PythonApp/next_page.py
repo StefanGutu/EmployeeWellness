@@ -25,22 +25,26 @@ def draw_dynamic_line(event, canvas, next_window, label):
 
 def open_next_page(root, username_entry):
     # Hide the login window
-    root.withdraw()
-
+    root.withdraw()  # Hide the login window instead of destroying it, so it can be restored if needed.
+    
     # Create a new window for the next page
-    next_window = tk.Toplevel(root)
+    next_window = tk.Toplevel()
     next_window.title("Next Page")
-    next_window.geometry("400x250")  # Initial size
-    next_window.configure(bg="#f0f0f0")  # Light background color
-
+    screen_width = next_window.winfo_screenwidth()
+    screen_height = next_window.winfo_screenheight()
+    next_window.geometry(f"{screen_width}x{screen_height}")
+    next_window.configure(bg="#B8BCD3")  # Light background color
+    
     # Create a Canvas widget to allow drawing of the line
-    canvas = tk.Canvas(next_window, bg="#f0f0f0", height=250)
+    canvas = tk.Canvas(next_window, bg="#B8BCD3", height=250)
     canvas.pack(fill="both", expand=True)
 
     # Customize the user greeting label with a cool design
     greeting_text = f"Welcome {username_entry.get()}!"
-    next_label = ttk.Label(next_window, text=greeting_text, font=("Helvetica", 40, "bold"), anchor="center", background="#f0f0f0")
-    
+    style = ttk.Style()
+    style.configure("TLabel", background="#B8BCD3")
+    next_label = ttk.Label(next_window, text=greeting_text, font=("Helvetica", 40, "bold"), anchor="center", bg="#B8BCD3")
+
     # Position the label at the top of the window, horizontally centered
     next_label.place(relx=0.5, rely=0.05, anchor="center")  # Positioning at the top (5% from top)
 
@@ -51,7 +55,7 @@ def open_next_page(root, username_entry):
     next_window.bind("<Configure>", lambda event, canvas=canvas, next_window=next_window, label=next_label: draw_dynamic_line(event, canvas, next_window, label))
 
     # Button to close the next page and quit the application
-    close_button = ttk.Button(next_window, text="Close", command=root.quit, style="TButton")
+    close_button = ttk.Button(next_window, text="Close", command=lambda: [next_window.quit(), root.quit()], style="TButton")
     close_button.place(relx=0.5, rely=0.75, anchor="center")
 
     # Add styling to the close button for a modern look
@@ -60,17 +64,7 @@ def open_next_page(root, username_entry):
     style.configure("TButton:hover", background="#4CAF50", foreground="white")
 
     # Ensure that when the new window is closed, the application will exit
-    next_window.protocol("WM_DELETE_WINDOW", lambda: [next_window.destroy(), root.quit()])
+    next_window.protocol("WM_DELETE_WINDOW", lambda: [next_window.quit(), root.quit()])
 
-root = tk.Tk()
-root.geometry("300x200")
+    next_window.mainloop()
 
-# Create a username entry for login
-username_entry = ttk.Entry(root)
-username_entry.pack(pady=20)
-
-# Button to open the next page
-login_button = ttk.Button(root, text="Login", command=lambda: open_next_page(root, username_entry))
-login_button.pack()
-
-root.mainloop()

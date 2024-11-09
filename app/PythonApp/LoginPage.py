@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+import next_page
 
 
 UserData = {
@@ -28,6 +29,7 @@ def validate_login():
         
     username_entry.delete(0, tk.END)
     password_entry.delete(0, tk.END)
+    next_page.open_next_page(root,username_entry)
     
 
 def add_user():
@@ -46,6 +48,7 @@ def add_user():
             
     username_entry.delete(0, tk.END)
     password_entry.delete(0, tk.END)
+    next_page.open_next_page(root,username_entry)
     
     
 

@@ -81,8 +81,6 @@ def draw_keypoints(image, pose):
 def point_distance(x:tuple, y:tuple)->float:
     return math.sqrt((x[1]-x[0])**2 + (y[1]-y[0])**2)
 
-def get_pose_params():
-    return params
 
 def get_tilt(type:str, points:dict) -> float:
     return math.atan(point_distance((points[f'Right {type}'].x, points[f'Right {type}'].x), (points[f"Right {type}"].y, points[f'Left {type}'].y)) / point_distance((points[f'Left {type}'].x, points[f'Right {type}'].x), (points[f"Left {type}"].y, points[f'Left {type}'].y)))
@@ -97,21 +95,10 @@ def get_depth(type:str, points:dict, mode='vertical') -> float:
         return math.atan(point_distance((points[f'Right {type}'].z, points[f'Right {type}'].z), (points[f"Right {type}"].x, points[f'Left {type}'].x)) / point_distance((points[f'Left {type}'].z, points[f'Right {type}'].z), (points[f"Left {type}"].x, points[f'Left {type}'].x)))
 
 
-# Start capturing video from the webcam
-cap = cv2.VideoCapture(0)
-# Check if the resolution was set correctly
-actual_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-actual_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-# print(f"Resolution set to: {actual_width} x {actual_height}")
+def get_pose_params(frame):
 
-# Initialize MediaPipe Pose in a context
-with mp_pose.Pose(static_image_mode=False) as pose:
-    while cap.isOpened():
-        ret, frame = cap.read()
-        frame = cv2.flip(frame, 1)
-        if not ret:
-            break
-        
+    # Initialize MediaPipe Pose in a context
+    with mp_pose.Pose(static_image_mode=False) as pose:
         # Process and draw keypoints on the frame
         pose_points = get_points(frame, pose)
         annotated_frame = draw_keypoints(frame, pose)
@@ -124,37 +111,15 @@ with mp_pose.Pose(static_image_mode=False) as pose:
         params['Neck Ratio'] = point_distance((pose_points["Nose"].x, pose_points["Mid Shoulder"].x), (pose_points["Nose"].y, pose_points["Mid Shoulder"].y)) / point_distance((pose_points['Left Shoulder'].x, pose_points['Right Shoulder'].x), (pose_points['Left Shoulder'].y, pose_points['Right Shoulder'].y))
         params['Neck Depth'] = math.atan(point_distance((pose_points['Nose'].z, pose_points['Nose'].z), (pose_points['Nose'].y, pose_points['Mid Shoulder'].y)) / point_distance((pose_points['Nose'].z, pose_points['Mid Shoulder'].z), (pose_points['Mid Shoulder'].y, pose_points['Mid Shoulder'].y)))
         params['Shoulders Depth'] = get_depth('Shoulder', pose_points, 'horizontal')
-        
-        # Useful prints for debugging
-        head_r_txt = f"Head R = {params["Head Ratio"]}"
-        head_t_txt = f"Shoulder D = {params['Shoulders Depth']}"
 
-        frame_height, frame_width = frame.shape[:2]
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 0.5
-        color = (255, 255, 255)
-        thickness = 2
-        (text_width, text_height), baseline = cv2.getTextSize(head_r_txt, font, font_scale, thickness)
-        x=frame_width - text_width -10
-        y = 10+text_height
-
-        cv2.putText(annotated_frame, head_r_txt, (x,y), font, font_scale, color, thickness)   
-
-        (text_width, text_height), baseline = cv2.getTextSize(head_t_txt, font, font_scale, thickness)
-        x=frame_width - text_width -10
-        y = 30+text_height
-
-        cv2.putText(annotated_frame, head_t_txt, (x,y), font, font_scale, color, thickness)  
-
-
-
-        # Display the resulting frame
-        cv2.imshow("Body Keypoints with Lines", annotated_frame)
-
-        # Press 'q' to exit
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    return params
 
 # Release the webcam and close all OpenCV windows
-cap.release()
-cv2.destroyAllWindows()
+
+img = cv2.imread("img1.jpeg")
+if img is None:
+    print("Error: Image not found or could not be loaded.")
+else:
+    get_pose_params(img)
+    print(params)
+

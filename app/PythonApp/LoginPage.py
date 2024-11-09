@@ -13,15 +13,16 @@ def validate_login():
     password = password_entry.get()
 
     if username in UserData:
-        if UserData[username] == password:
-            messagebox.showinfo("Login Successful", "Welcome!")
-        else:
-            messagebox.showerror("Login Failed", "Password wrong!")
+        if UserData[username] != password:
+            
+            # messagebox.showinfo("Login Successful", "Welcome!")
+        # else:
+            # messagebox.showerror("Login Failed", "Password wrong!")
             username_entry.delete(0, tk.END)
             password_entry.delete(0, tk.END)
             return False
     else:
-        messagebox.showerror("Login Failed", "Invalid username or password")
+        messagebox.showerror("Error", "Invalid username or password")
         username_entry.delete(0, tk.END)
         password_entry.delete(0, tk.END)
         return False
@@ -39,9 +40,9 @@ def add_user():
     if(username.strip() != "" and password.strip() != ""):
         if username not in UserData:
             UserData[username] = password
-            messagebox.showinfo("Auth successful!","Welcome!")
+            # messagebox.showinfo("Auth successful!","Welcome!")
         else:
-            messagebox.showerror("User exist","Try again")
+            messagebox.showerror("Error","User exist!")
             username_entry.delete(0, tk.END)
             password_entry.delete(0, tk.END)
             return False

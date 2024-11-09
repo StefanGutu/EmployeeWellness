@@ -1,14 +1,7 @@
 import random
-import time
-import subprocess
+import asyncio
 
+# Function to generate random numbers continuously
 def generate_random_numbers():
-    while True:
-        # Generează un număr aleatoriu între 1 și 4
-        number = random.randint(1, 4)
-        print(f"{number}")
-        
-        # Așteaptă 1 minut
-        time.sleep(10)  # 60 secunde = 1 minut
+    return random.randint(0, 5)
 
-generate_random_numbers()

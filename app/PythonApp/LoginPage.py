@@ -53,7 +53,11 @@ def add_user():
 # Create main window
 root = tk.Tk()
 root.title("Wellness App")
-root.geometry("1920x1080")
+# root.geometry("1920x1080")
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+# Setează dimensiunea ferestrei să fie maximă
+root.geometry(f"{screen_width}x{screen_height}")
 root.configure(bg="#B8BCD3")  # Light background color
 
 # Create a frame for the login form

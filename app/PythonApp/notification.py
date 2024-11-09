@@ -1,5 +1,8 @@
-from win10toast import ToastNotifier
+from plyer import notification
 
 def send_notification(title, message):
-    toaster = ToastNotifier()
-    toaster.show_toast(title, message, duration=10)  # duration in seconds
+    notification.notify(
+        title=title,
+        message=message,
+        timeout=10  # Time in seconds for the notification to stay visible
+    )

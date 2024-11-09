@@ -101,7 +101,13 @@ def get_pose_params(frame):
     with mp_pose.Pose(static_image_mode=False) as pose:
         # Process and draw keypoints on the frame
         pose_points = get_points(frame, pose)
-        annotated_frame = draw_keypoints(frame, pose)
+
+        # Check if pose_points is None or does not contain required points
+        required_points = ["Right Eye", "Left Eye", "Right Shoulder", "Left Shoulder", "Nose", "Mid Shoulder"]
+        if pose_points is None or not all(key in pose_points for key in required_points):
+            return frame, None
+        else:
+            annotated_frame = draw_keypoints(frame, pose)
 
         params["Head Ratio"] = point_distance((pose_points["Right Eye"].x, pose_points["Left Eye"].x), (pose_points["Right Eye"].y, pose_points["Left Eye"].y)) / point_distance((pose_points['Left Shoulder'].x, pose_points['Right Shoulder'].x), (pose_points['Left Shoulder'].y, pose_points['Right Shoulder'].y))
         params['Head Tilt'] = get_tilt("Eye", pose_points)
@@ -112,14 +118,15 @@ def get_pose_params(frame):
         params['Neck Depth'] = math.atan(point_distance((pose_points['Nose'].z, pose_points['Nose'].z), (pose_points['Nose'].y, pose_points['Mid Shoulder'].y)) / point_distance((pose_points['Nose'].z, pose_points['Mid Shoulder'].z), (pose_points['Mid Shoulder'].y, pose_points['Mid Shoulder'].y)))
         params['Shoulders Depth'] = get_depth('Shoulder', pose_points, 'horizontal')
 
-    return params
+    return annotated_frame, params
 
 # Release the webcam and close all OpenCV windows
 
-img = cv2.imread("img1.jpeg")
-if img is None:
-    print("Error: Image not found or could not be loaded.")
-else:
-    get_pose_params(img)
-    print(params)
-
+# img = cv2.imread("img1.jpeg")
+# if img is None:
+#     print("Error: Image not found or could not be loaded.")
+# else:
+#     new_img, p = get_pose_params(img)
+#     print(p)
+#     cv2.imshow("New Image", new_img)
+#     cv2.waitKey(0)

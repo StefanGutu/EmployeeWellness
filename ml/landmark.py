@@ -50,8 +50,12 @@ def get_points(image, pose):
 
 # Function to extract and draw keypoints
 def draw_keypoints(image, pose):
-
     points = get_points(image, pose)
+    
+    # Check if points are None (i.e., no pose detected)
+    if points is None:
+        print("No person detected in the frame.")
+        return image  # Return the original image without modifications
 
     def draw_line(pt1, pt2, color=(0, 255, 0), thickness=2):
         cv2.line(
@@ -64,7 +68,6 @@ def draw_keypoints(image, pose):
 
     # Draw lines for eyes, shoulders, and hips
     draw_line((points["Right Eye"].x, points["Right Eye"].y), (points["Left Eye"].x, points["Left Eye"].y))
-    # draw_line((points["Right Shoulder"].x, points["Right Shoulder"].y), (points["Left Shoulder"].x, points["Left Shoulder"].y))
     draw_line((points["Right Hip"].x, points["Right Hip"].y), (points["Left Hip"].x, points["Left Hip"].y))
     draw_line(points['Mid Shoulder'], points['Mid Hip'])  # Torso center line
 
@@ -77,6 +80,7 @@ def draw_keypoints(image, pose):
     draw_line((points["Left Shoulder"].x, points["Left Shoulder"].y), points['Mid Shoulder'], color=(0, 0, 255), thickness=2)  # Blue line
 
     return image
+
 
 def point_distance(x:tuple, y:tuple)->float:
     return math.sqrt((x[1]-x[0])**2 + (y[1]-y[0])**2)
@@ -111,10 +115,25 @@ with mp_pose.Pose(static_image_mode=False) as pose:
         frame = cv2.flip(frame, 1)
         if not ret:
             break
-        
+
         # Process and draw keypoints on the frame
         pose_points = get_points(frame, pose)
-        annotated_frame = draw_keypoints(frame, pose)
+
+        # Check if pose_points is None or does not contain required points
+        required_points = ["Right Eye", "Left Eye", "Right Shoulder", "Left Shoulder", "Nose", "Mid Shoulder"]
+        # TODO: bagam in retea doar daca este pose_points != None
+        if pose_points is None or not all(key in pose_points for key in required_points):
+            annotated_frame = frame  # Show the original frame without modifications
+            
+            cv2.imshow("Body Keypoints with Lines", annotated_frame)
+
+            # Press 'q' to exit
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            continue
+        else:
+            annotated_frame = draw_keypoints(frame, pose)
+            # Display the resulting frame
 
         params["Head Ratio"] = point_distance((pose_points["Right Eye"].x, pose_points["Left Eye"].x), (pose_points["Right Eye"].y, pose_points["Left Eye"].y)) / point_distance((pose_points['Left Shoulder'].x, pose_points['Right Shoulder'].x), (pose_points['Left Shoulder'].y, pose_points['Right Shoulder'].y))
         params['Head Tilt'] = get_tilt("Eye", pose_points)

@@ -36,13 +36,12 @@ def open_next_page(username, root):
     # Position the value label below the welcome label
     value_label.place(relx=0.5, rely=0.5, anchor="center")
 
-    # Counter for warning values 1, 2, or 3
-    warning_count = 0
+    # List to store the last three warning values
+    warning_sequence = []
     screen_locked = False
 
     # Function to lock the entire screen
     def lock_screen():
-        # Create a fullscreen window to simulate screen lock
         lock_window = tk.Toplevel()
         lock_window.attributes("-fullscreen", True)
         lock_window.configure(bg="black")
@@ -73,7 +72,7 @@ def open_next_page(username, root):
 
     # Function to show notifications in a separate thread
     def show_notification_in_thread():
-        nonlocal warning_count, screen_locked
+        nonlocal screen_locked, warning_sequence
         try:
             value = int(my_val.get())
 
@@ -88,19 +87,23 @@ def open_next_page(username, root):
                     case 3:
                         notification.send_notification("Bad shoulders!", "Correct your shoulders posture!")
 
-                # Increment the warning count
-                warning_count += 1
+                # Add value to warning sequence
+                warning_sequence.append(value)
 
-                # Lock the screen if there have been three warnings
-                if warning_count >= 3 and not screen_locked:
+                # If we have three warnings in sequence, lock the screen
+                if len(warning_sequence) == 3:
                     screen_locked = True
                     lock_window = lock_screen()  # Lock the screen
 
-            # Check if the screen is locked and if value is 0 to unlock it
-            elif screen_locked and value == 0:
+            # If the value is 0, reset the warning sequence
+            elif value == 0:
+                warning_sequence.clear()
+
+            # If screen is locked and receives 0, unlock
+            if screen_locked and value == 0:
                 screen_locked = False
-                warning_count = 0  # Reset warning count
-                unlock_screen(lock_window)  # Unlock the screen
+                unlock_screen(lock_window)
+                warning_sequence.clear()
                 messagebox.showinfo("Screen Unlocked", "Screen has been unlocked.")
 
         except ValueError:

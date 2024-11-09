@@ -25,8 +25,12 @@ def validate_login():
         username_entry.delete(0, tk.END)
         password_entry.delete(0, tk.END)
         return False
-        
-    next_page.open_next_page(root, username_entry)
+    
+    
+    username_entry.delete(0, tk.END)
+    password_entry.delete(0, tk.END)     
+    next_page.open_next_page(username,root) #Aici
+    # root.quit()
 
 def add_user():
     username = username_entry.get()
@@ -42,7 +46,10 @@ def add_user():
             password_entry.delete(0, tk.END)
             return False
             
-    next_page.open_next_page(root, username_entry)
+    username_entry.delete(0, tk.END)
+    password_entry.delete(0, tk.END)
+    next_page.open_next_page(username,root) #Aici
+    # root.quit()
 
 
 # Create main window

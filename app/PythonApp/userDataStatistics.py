@@ -52,7 +52,7 @@ def open_data_statistics(user_id,old_root):
 
         # Modificăm etichetele axelor și titlul cu font, dimensiune și culoare diferite
         ax.set_xlabel('Categories', fontsize=12, fontweight='bold', color='blue', labelpad=15)
-        ax.set_ylabel('Number', fontsize=12, fontweight='bold', color='blue', labelpad=15)
+        ax.set_ylabel('Total receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_title('Total Statistics', fontsize=14, fontweight='bold', color='darkgreen', pad=20)
 
         # Setăm intervalul pentru axa Y (de la 0 la 100)
@@ -80,7 +80,7 @@ def open_data_statistics(user_id,old_root):
 
     def show_latest_statistics():
         # Categoriile pentru care vrem să calculăm procentele
-        categories = ['1', '2', '3']
+        categories = ['Head', 'Shoulders', 'Close to Monitor']
 
         # Obținem valorile din baza de date (aici se presupune că ai funcția care le aduce corect)
         values = dataBaseCode.get_latest_numbers(user_id)
@@ -124,7 +124,7 @@ def open_data_statistics(user_id,old_root):
 
         # Modificăm etichetele axelor și titlul
         ax.set_xlabel('Categories', fontsize=12, fontweight='bold', color='blue', labelpad=15)
-        ax.set_ylabel('Count', fontsize=12, fontweight='bold', color='blue', labelpad=15)
+        ax.set_ylabel('Recent receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_title('Latest Statistics', fontsize=14, fontweight='bold', color='darkgreen', pad=20)
 
         # Setăm intervalul pentru axa Y

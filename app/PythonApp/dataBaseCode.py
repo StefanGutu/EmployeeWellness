@@ -25,9 +25,16 @@ def get_user_id_by_name(username):
 def get_user_password(username):
     conn = sqlite3.connect('UserData.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT password FROM UserData where name = ?", (username,))
-    user_pass = cursor.fetchone()
-    return user_pass[0]
+    cursor.execute("SELECT password FROM UserData WHERE name = ?", (username,))
+    user_pass = cursor.fetchone()  # Aici va returna fie un tuplu, fie None
+    conn.close()
+
+    # Verificăm dacă rezultatul este None
+    if user_pass is not None:
+        return user_pass[0]  # Accesăm parola
+    else:
+        return None  # Returnăm None dacă utilizatorul nu există
+
 
 def check_user_exists(username):
     conn = sqlite3.connect('UserData.db')
@@ -43,6 +50,44 @@ def check_user_exists(username):
         return True  
     else:
         return False  
+    
+def add_number_to_database(user_id, number):
+    # Conectăm la baza de date
+    conn = sqlite3.connect('UserData.db')
+    cursor = conn.cursor()
+
+    # Inserăm numărul pentru un user_id specific
+    cursor.execute('''
+    INSERT INTO user_data (user_id, number)
+    VALUES (?, ?)
+    ''', (user_id, number))
+
+    # Confirmăm și salvăm modificările
+    conn.commit()
+    # Închidem conexiunea
+    conn.close()
+
+def get_latest_numbers(user_id):
+    # Conectăm la baza de date
+    conn = sqlite3.connect('UserData.db')
+    cursor = conn.cursor()
+
+    # Selectăm cele mai recente numere adăugate de user_id-ul specificat
+    cursor.execute(''' 
+    SELECT number, created_at FROM user_data 
+    WHERE user_id = ? 
+    ORDER BY created_at DESC
+    ''', (user_id,))
+
+    # Obținem toate rezultatele
+    rows = cursor.fetchall()
+
+    # Închidem conexiunea
+    conn.close()
+
+    # Returnează primele 10 înregistrări (sau mai puține, dacă sunt mai puține înregistrări)
+    return rows[:10]
+
 
 #Function will initialize the Stats for the new user
 def add_initial_status(id_user):
@@ -76,25 +121,34 @@ def get_status(id_user):
     conn.close()
     return results
 
-
-
 #This will create the tables if they dont exists already
 def create_base():
     conn = sqlite3.connect('UserData.db')
     cursor = conn.cursor()
 
+    # Creăm tabelul UserData
     cursor.execute('''CREATE TABLE IF NOT EXISTS UserData (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name VARCHAR(30),
                         password VARCHAR(50)
                     )''')
 
+    # Creăm tabelul UserStats
     cursor.execute('''CREATE TABLE IF NOT EXISTS UserStats (
                         id_user INTEGER,
                         head_signal INTEGER,
                         close_signal INTEGER,
                         shoulder_signal INTEGER,
                         FOREIGN KEY (id_user) REFERENCES UserData (id)
+                    )''')
+
+    # Creăm tabelul user_data fără constrângerea UNIQUE pe user_id
+    cursor.execute('''CREATE TABLE IF NOT EXISTS user_data (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        number INTEGER NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES UserData(id)
                     )''')
 
     conn.commit()

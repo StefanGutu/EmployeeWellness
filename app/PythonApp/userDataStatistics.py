@@ -3,6 +3,8 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 import numpy as np
 import dataBaseCode
+import next_page
+import importlib 
 
 def open_data_statistics(user_id,old_root):
     
@@ -26,6 +28,9 @@ def open_data_statistics(user_id,old_root):
 
     # Funcții pentru butoane
     def show_total_statistics():
+        # Închide orice grafic existent înainte de a crea unul nou
+        plt.close()  # Sau plt.clf() pentru a curăța figura curentă
+
         # Creăm date aleatoare pentru grafic (valori între 0 și 100)
         categories = ['Head', 'Shoulders', 'Close to Monitor']
 
@@ -37,9 +42,6 @@ def open_data_statistics(user_id,old_root):
 
         # Creăm o listă cu valorile pentru grafic
         values = [head_signal, shoulder_signal, close_signal]
-
-
-        # values = np.random.randint(0, 101, size=3)  # Generăm 3 valori aleatoare între 0 și 100
 
         # Creăm o fereastră pentru grafic
         fig, ax = plt.subplots()
@@ -77,58 +79,60 @@ def open_data_statistics(user_id,old_root):
         plt.show()
 
     def show_latest_statistics():
-        # Creăm date aleatoare pentru grafic (valori între 0 și 10)
-        categories = ['Head', 'Shoulders', 'Close to Monitor']
-        values = np.random.randint(0, 11, size=3)  # Generăm 3 valori aleatoare între 0 și 10
+        # Categoriile pentru care vrem să calculăm procentele
+        categories = ['1', '2', '3']
 
-        # Calculăm suma totală a valorilor
-        total_value = sum(values)
+        # Obținem valorile din baza de date (aici se presupune că ai funcția care le aduce corect)
+        values = dataBaseCode.get_latest_numbers(user_id)
+        
+        if not values:
+            print("Nu au fost găsite valori pentru acest utilizator.")
+            return
 
-        # Dacă suma totală este 0, setăm un fallback pentru evitarea diviziunii prin 0
-        if total_value == 0:
-            percentages = [0, 0, 0]
-        else:
-            # Calculăm procentajele pentru fiecare coloană
-            percentages = [(value / total_value) * 100 for value in values]
+        # Extragem doar numerele (ignorați data pentru acest calcul)
+        numbers = [row[0] for row in values]  # Extragem doar prima coloană care conține numerele
 
-        # Creăm o fereastră pentru grafic
-        fig, ax = plt.subplots()
+        # Calculăm câte valori sunt de fiecare tip (1, 2 și 3)
+        count_1 = numbers.count(1)
+        count_2 = numbers.count(2)
+        count_3 = numbers.count(3)
 
-        # Grafic cu 3 coloane și culori diferite
-        colors = ['red', 'green', 'blue']  # Culori pentru coloane
-        ax.bar(categories, values, color=colors)
+        # Calculăm procentele pentru fiecare număr
+        total = len(values)
+        percentage_1 = (count_1 / total) * 100
+        percentage_2 = (count_2 / total) * 100
+        percentage_3 = (count_3 / total) * 100
 
-        # Modificăm etichetele axelor și titlul cu font, dimensiune și culoare diferite
+        # Lista cu valorile numărate (count_1, count_2, count_3)
+        counts = [count_1, count_2, count_3]
+
+        # Procentele pentru fiecare categorie
+        percentages = [percentage_1, percentage_2, percentage_3]
+
+        # Creăm graficul
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        # Culori pentru fiecare coloană
+        colors = ['red', 'green', 'blue']
+
+        # Afișăm bara cu valorile pentru 1, 2 și 3
+        ax.bar(categories, counts, color=colors)
+
+        # Adăugăm procentele deasupra fiecărei coloane
+        for i, (count, percentage) in enumerate(zip(counts, percentages)):
+            ax.text(i, count + 0.2, f'{percentage:.1f}%', ha='center', fontsize=9, fontweight='bold', color='black')
+
+        # Modificăm etichetele axelor și titlul
         ax.set_xlabel('Categories', fontsize=12, fontweight='bold', color='blue', labelpad=15)
-        ax.set_ylabel('Number', fontsize=12, fontweight='bold', color='blue', labelpad=15)
+        ax.set_ylabel('Count', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_title('Latest Statistics', fontsize=14, fontweight='bold', color='darkgreen', pad=20)
 
-        # Setăm intervalul pentru axa Y (de la 0 la 10)
-        ax.set_ylim(0, 10)
-
-        # Setăm pozițiile axei X pentru etichete
-        ax.set_xticks(np.arange(len(categories)))  # Pozițiile corespunzătoare categoriilor
-
-        # Modificăm etichetele axei X și le facem **bold** și font mai mic
-        ax.set_xticklabels(categories, fontweight='bold', fontsize=9)
-
-        # Afișăm procentele deasupra coloanelor
-        for i, (value, percentage) in enumerate(zip(values, percentages)):
-            ax.text(i, value + 0.2, f'{percentage:.1f}%', ha='center', fontsize=9, fontweight='bold', color='black')
-
-        # Obținem managerul ferestrei
-        manager = plt.get_current_fig_manager()
-
-        # Obținem fereastra și o poziționăm manual
-        window = manager.window
-        window_width = 800
-        window_height = 600
-        x_pos = (screen_width - window_width) // 2
-        y_pos = (screen_height - window_height) // 2
-        window.geometry(f"{window_width}x{window_height}+{x_pos}+{y_pos}")
+        # Setăm intervalul pentru axa Y
+        ax.set_ylim(0, max(counts) + 2)
 
         # Afișăm graficul
         plt.show()
+
 
     # Adăugăm un titlu centrat pe prima linie
     title_label = ttk.Label(

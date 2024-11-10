@@ -9,7 +9,6 @@ import dataBaseCode
 import userDataStatistics
 
 
-
 random_gen = generateData.RandomNumberGenerator()
 # Function that opens the next page after login
 def open_next_page(username, root):
@@ -105,12 +104,15 @@ def open_next_page(username, root):
                 match value:
                     case 1:
                         dataBaseCode.increment_signal(user_id,"head_signal")
+                        dataBaseCode.add_number_to_database(user_id,1)
                         notification.send_notification("Bad head!", "Correct your head posture!")
                     case 2:
                         dataBaseCode.increment_signal(user_id,"close_signal")
+                        dataBaseCode.add_number_to_database(user_id,2)
                         notification.send_notification("Close to monitor!", "Correct your posture!")
                     case 3:
                         dataBaseCode.increment_signal(user_id,"shoulder_signal")
+                        dataBaseCode.add_number_to_database(user_id,3)
                         notification.send_notification("Bad shoulders!", "Correct your shoulders posture!")
 
                 # Add value to warning sequence

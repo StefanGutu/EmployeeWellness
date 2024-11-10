@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import math
 from collections import namedtuple
+import numpy as np
 
 # Initialize MediaPipe Pose and Drawing modules
 mp_pose = mp.solutions.pose
@@ -30,7 +31,7 @@ def get_points(image, pose):
     
     results = pose.process(image_rgb)
     if not results.pose_landmarks:
-        return image
+        return None
 
     landmarks = results.pose_landmarks.landmark
     points = {
@@ -52,7 +53,8 @@ def get_points(image, pose):
 def draw_keypoints(image, pose):
 
     points = get_points(image, pose)
-
+    if points is None:
+        return image
     def draw_line(pt1, pt2, color=(0, 255, 0), thickness=2):
         cv2.line(
             image,
@@ -104,7 +106,7 @@ def get_pose_params(frame):
 
         # Check if pose_points is None or does not contain required points
         required_points = ["Right Eye", "Left Eye", "Right Shoulder", "Left Shoulder", "Nose", "Mid Shoulder"]
-        if pose_points is None or not all(key in pose_points for key in required_points):
+        if pose_points is None or not np.all(pose_points != None) or not all(key in pose_points for key in required_points):
             return frame, None
         else:
             annotated_frame = draw_keypoints(frame, pose)

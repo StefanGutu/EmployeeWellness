@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
@@ -7,7 +8,18 @@ import notification
 import UserBlockCase
 import dataBaseCode
 import userDataStatistics
+import pickle 
+import cv2
+import numpy as np
+import time
+import sys
+import os
 
+sys.path.append(os.path.abspath("../../ml"))
+from image_landmark import get_pose_params
+
+with open("../../ml/model/model.pkl", 'rb') as model_file:
+        model = pickle.load(model_file)
 
 random_gen = generateData.RandomNumberGenerator()
 # Function that opens the next page after login
@@ -60,6 +72,7 @@ def open_next_page(username, root):
 
     # Function to lock the entire screen
     def lock_screen():
+        nonlocal lock_window
         lock_window = tk.Toplevel()
         lock_window.attributes("-fullscreen", True)
         lock_window.configure(bg="black")
@@ -71,7 +84,7 @@ def open_next_page(username, root):
 
         # Disable keyboard and mouse input
         # ctypes.windll.user32.BlockInput(True)
-        # UserBlockCase.blockinput()
+        UserBlockCase.blockinput()
 
     # Function to unlock the screen
     def unlock_screen():
@@ -80,17 +93,29 @@ def open_next_page(username, root):
             lock_window.destroy()
             lock_window = None
             # ctypes.windll.user32.BlockInput(False)
-            # UserBlockCase.unblockinput()
+            UserBlockCase.unblockinput()
 
     # Function to change the element with a generated value
     def change_elem():
+        cap = cv2.VideoCapture(0)
+        _, frame = cap.read()
+        _, params = get_pose_params(frame)
+
+        if params:
+            # Predict only if parameters are available
+            pred_vec = model.predict_proba(np.array(list(params.values())).reshape(1, -1)).squeeze()
+            y_pred = np.argmax(pred_vec)
+            print(y_pred)
+        else:
+            y_pred = 0
         # my_val.set(str(generateData.generate_random_numbers()))
-        my_val.set(str(random_gen.generate_random_number()))
+        cap.release()
+        my_val.set(str(y_pred))
         threading.Thread(target=show_notification_in_thread(user_id)).start()
-        next_page_window.after(10000, change_elem)  # Schedule the next update
+        next_page_window.after(5000, change_elem)  # Schedule the next update
 
     # Start updating the value label after 10 seconds
-    next_page_window.after(10000, change_elem)
+    next_page_window.after(5000, change_elem)
 
     # Function to show notifications in a separate thread
     def show_notification_in_thread(user_id):
@@ -130,9 +155,9 @@ def open_next_page(username, root):
             # If screen is locked and receives 0, unlock
             if screen_locked and value == 0:
                 screen_locked = False
-                unlock_screen(lock_window)
+                unlock_screen()
                 warning_sequence.clear()
-                messagebox.showinfo("Screen Unlocked", "Screen has been unlocked.")
+                # messagebox.showinfo("Screen Unlocked", "Screen has been unlocked.")
 
         except ValueError:
             pass  # Handle cases where my_val is not an integer

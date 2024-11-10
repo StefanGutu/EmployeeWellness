@@ -2,25 +2,24 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 import next_page
+import dataBaseCode
 
 UserData = {
     "admin": "1111"
 }
 
+dataBaseCode.create_base()
+# dataBaseCode.drop_tables()  #to reset the database comment create_base and uncomment this
 # Function to validate login
 def validate_login():
     username = username_entry.get()
     password = password_entry.get()
 
-    if username in UserData:
-        if UserData[username] != password:
-            
-            # messagebox.showinfo("Login Successful", "Welcome!")
-        # else:
-            # messagebox.showerror("Login Failed", "Password wrong!")
-            username_entry.delete(0, tk.END)
-            password_entry.delete(0, tk.END)
-            return False
+    checkPassword = dataBaseCode.get_user_password(username)
+
+    if checkPassword == password:
+        username_entry.delete(0, tk.END)
+        password_entry.delete(0, tk.END)
     else:
         messagebox.showerror("Error", "Invalid username or password")
         username_entry.delete(0, tk.END)
@@ -36,8 +35,11 @@ def add_user():
     password = password_entry.get()
     
     if username.strip() != "" and password.strip() != "":
-        if username not in UserData:
-            UserData[username] = password
+        if dataBaseCode.check_user_exists(username) is False:
+            dataBaseCode.add_user(username,password)
+            temp_id = dataBaseCode.get_user_id_by_name(username)
+            dataBaseCode.add_initial_status(temp_id)
+            # UserData[username] = password
             # messagebox.showinfo("Auth successful!","Welcome!")
         else:
             messagebox.showerror("Error","User exist!")

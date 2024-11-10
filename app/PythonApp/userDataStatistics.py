@@ -30,7 +30,7 @@ def open_data_statistics(user_id, old_root):
         plt.close()
 
         # Date de test pentru grafice
-        categories = ['Head', 'Shoulders', 'Close to Monitor']
+        categories = ['Head', 'Close to Monitor' ,'Shoulders']
         res = dataBaseCode.get_status(user_id)
 
         head_signal = res[0][1]
@@ -53,7 +53,7 @@ def open_data_statistics(user_id, old_root):
     # Funcția pentru afișarea ultimelor statistici
     def show_latest_statistics():
         # Categoriile pentru care vrem să calculăm procentele
-        categories = ['Head', 'Shoulders', 'Close to Monitor']
+        categories = ['Head','Close to Monitor','Shoulders']
 
         # Obținem valorile din baza de date (aici se presupune că ai funcția care le aduce corect)
         values = dataBaseCode.get_latest_numbers(user_id)
@@ -116,8 +116,8 @@ def open_data_statistics(user_id, old_root):
             popup, 
             text="Here are some recommendations based on your data.\n\n"
                  f"Head Position: {percentage_1}%\n"
-                 f"Shoulders Position: {percentage_2}%\n"
-                 f"Head Posture: {percentage_3}%\n\n"
+                 f"Close Position: {percentage_2}%\n"
+                 f"Shoulders Posture: {percentage_3}%\n\n"
                  "Follow these suggestions for better health and comfort.😊",
             font=("Helvetica", 14,"bold"), 
             background="#ADE1E7",

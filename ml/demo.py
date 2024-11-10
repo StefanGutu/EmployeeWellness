@@ -11,7 +11,7 @@ signal2text = {
 }
 
 # Load the model
-with open("model/model.pkl", 'rb') as model_file:
+with open("model/model1.pkl", 'rb') as model_file:
     model = pickle.load(model_file)
 
 cap = cv2.VideoCapture(0)

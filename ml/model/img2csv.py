@@ -2,6 +2,10 @@ import pandas as pd
 import cv2
 import os
 import numpy as np
+
+external_directory_path = os.path.abspath("../")
+sys.path.append(external_directory_path)
+
 from image_landmark import get_pose_params
 import random
 
@@ -27,7 +31,7 @@ def augment_image(image):
     return image
 
 
-def get_dataset(input_path: str, output_path="posture_dataset.csv", aug=False):
+def get_dataset(input_path: str, output_path="posture_dataset_aug.csv", aug=False):
     columns = []
     # Loop through all files in the directory
     for filename in os.listdir(input_path):
@@ -38,7 +42,7 @@ def get_dataset(input_path: str, output_path="posture_dataset.csv", aug=False):
             continue
 
         # sharpened_img, flipped_img = augument_image(img)
-
+        print(filename)
         _, img_params = get_pose_params(img)
         if img_params:
             if not columns:
@@ -60,10 +64,5 @@ def get_dataset(input_path: str, output_path="posture_dataset.csv", aug=False):
     # df.to_csv(output_path)
 
 
-get_dataset("../posture_images_data")
+get_dataset("augmented_data")
         
-
-
-
-
-

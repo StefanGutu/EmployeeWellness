@@ -21,9 +21,15 @@ from image_landmark import get_pose_params
 with open("../../ml/model/model.pkl", 'rb') as model_file:
         model = pickle.load(model_file)
 
+
+
 random_gen = generateData.RandomNumberGenerator()
 # Function that opens the next page after login
 def open_next_page(username, root):
+    SCREEN_TIME_LIMIT  = 15 # in seconds
+    FRAME_FREQ_RESPOND = 5
+    time_counter = 0
+    screen_frames_limit = SCREEN_TIME_LIMIT/FRAME_FREQ_RESPOND
     root.destroy()
     
     # Create a new window for the welcome page
@@ -100,14 +106,19 @@ def open_next_page(username, root):
         cap = cv2.VideoCapture(0)
         _, frame = cap.read()
         _, params = get_pose_params(frame)
-
+        nonlocal time_counter
         if params:
+            time_counter+=1
             # Predict only if parameters are available
             pred_vec = model.predict_proba(np.array(list(params.values())).reshape(1, -1)).squeeze()
             y_pred = np.argmax(pred_vec)
             print(y_pred)
+            if time_counter == screen_frames_limit:
+                y_pred = -1
+                time_counter = 0
+
         else:
-            y_pred = 0
+            time_counter = 0
         # my_val.set(str(generateData.generate_random_numbers()))
         cap.release()
         my_val.set(str(y_pred))

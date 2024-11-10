@@ -30,7 +30,7 @@ def open_data_statistics(user_id, old_root):
         plt.close()
 
         # Date de test pentru grafice
-        categories = ['Head', 'Close to Monitor' ,'Shoulders']
+        categories = ['Head', 'Shoulders', 'Close to Monitor']
         res = dataBaseCode.get_status(user_id)
 
         head_signal = res[0][1]
@@ -43,7 +43,6 @@ def open_data_statistics(user_id, old_root):
         ax.bar(categories, values, color=colors)
         ax.set_xlabel('Categories', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_ylabel('Total receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
-        ax.set_ylabel('Total receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_title('Total Statistics', fontsize=14, fontweight='bold', color='darkgreen', pad=20)
         ax.set_ylim(0, 100)
         ax.set_xticks(np.arange(len(categories)))
@@ -52,10 +51,7 @@ def open_data_statistics(user_id, old_root):
 
     # Funcția pentru afișarea ultimelor statistici
     def show_latest_statistics():
-        # Categoriile pentru care vrem să calculăm procentele
-        categories = ['Head','Close to Monitor','Shoulders']
-
-        # Obținem valorile din baza de date (aici se presupune că ai funcția care le aduce corect)
+        categories = ['Head', 'Shoulders', 'Close to Monitor']
         values = dataBaseCode.get_latest_numbers(user_id)
         
         if not values:
@@ -78,7 +74,6 @@ def open_data_statistics(user_id, old_root):
         for i, (count, percentage) in enumerate(zip(counts, [percentage_1, percentage_2, percentage_3])):
             ax.text(i, count + 0.2, f'{percentage:.1f}%', ha='center', fontsize=9, fontweight='bold', color='black')
         ax.set_xlabel('Categories', fontsize=12, fontweight='bold', color='blue', labelpad=15)
-        ax.set_ylabel('Recent receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_ylabel('Recent receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_title('Latest Statistics', fontsize=14, fontweight='bold', color='darkgreen', pad=20)
         ax.set_ylim(0, max(counts) + 2)
@@ -116,8 +111,8 @@ def open_data_statistics(user_id, old_root):
             popup, 
             text="Here are some recommendations based on your data.\n\n"
                  f"Head Position: {percentage_1}%\n"
-                 f"Close Position: {percentage_2}%\n"
-                 f"Shoulders Posture: {percentage_3}%\n\n"
+                 f"Shoulders Position: {percentage_2}%\n"
+                 f"Head Posture: {percentage_3}%\n\n"
                  "Follow these suggestions for better health and comfort.😊",
             font=("Helvetica", 14,"bold"), 
             background="#ADE1E7",
@@ -128,17 +123,25 @@ def open_data_statistics(user_id, old_root):
         def open_google(path):
             webbrowser.open(path)
 
-        # Linkuri pentru exerciții
-        hyperlinks = [
-            ("Exercise for good head posture", "https://backintelligence.com/how-to-fix-forward-head-posture/"),
-            ("Exercise for good shoulders posture", "https://www.healthline.com/health/rounded-shoulders-exercises"),
-            ("Exercise for good torso posture", "https://www.healthdirect.gov.au/how-to-improve-your-posture")
-        ]
-        
-        for text, url in hyperlinks:
-            link = ttk.Label(popup, text=text, foreground="black", font=("Helvetica", 12,"bold","underline"), background="#ADE1E7", cursor="hand2")
+        if percentage_1>percentage_2 and percentage_1>percentage_3:
+            hyperlinks=("Exercise for good head posture", "https://backintelligence.com/how-to-fix-forward-head-posture/")
+            text, url = hyperlinks
+            link = ttk.Label(popup, text=text,foreground="black", font=("Helvetica", 12,"bold","underline"), background="#ADE1E7", cursor="hand2")
             link.pack(pady=10)
             link.bind("<Button-1>", lambda e, u=url: open_google(u))
+        elif percentage_2>percentage_1 and percentage_2>percentage_3:
+            hyperlinks=("Exercise for good shoulders posture", "https://www.healthline.com/health/rounded-shoulders-exercises")
+            text, url = hyperlinks
+            link = ttk.Label(popup,text=text, foreground="black", font=("Helvetica", 12,"bold","underline"), background="#ADE1E7", cursor="hand2")
+            link.pack(pady=10)
+            link.bind("<Button-1>", lambda e, u=url: open_google(u))
+        elif percentage_3>percentage_1 and percentage_3>percentage_2:
+            hyperlinks=("Exercise for good torso posture", "https://www.healthdirect.gov.au/how-to-improve-your-posture")
+            text, url = hyperlinks
+            link = ttk.Label(popup,text=text, foreground="black", font=("Helvetica", 12,"bold","underline"), background="#ADE1E7", cursor="hand2")
+            link.pack(pady=10)
+            link.bind("<Button-1>", lambda e, u=url: open_google(u))
+
 
         close_button = ttk.Button(popup, text="Close", command=popup.destroy, style="TButton")
         close_button.pack(pady=10)

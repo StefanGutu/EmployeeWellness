@@ -122,7 +122,7 @@ def get_pose_params(frame):
 
 # Release the webcam and close all OpenCV windows
 
-# img = cv2.imread("img1.jpeg")
+# img = cv2.imread(r"C:\Users\sbeleaga\OneDrive - Intel Corporation\Desktop\EmployeeWellness\ml\posture_images_data\img90_3.jpg")
 # if img is None:
 #     print("Error: Image not found or could not be loaded.")
 # else:

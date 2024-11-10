@@ -14,10 +14,6 @@ def validate_login():
 
     if username in UserData:
         if UserData[username] != password:
-            
-            # messagebox.showinfo("Login Successful", "Welcome!")
-        # else:
-            # messagebox.showerror("Login Failed", "Password wrong!")
             username_entry.delete(0, tk.END)
             password_entry.delete(0, tk.END)
             return False
@@ -38,9 +34,8 @@ def add_user():
     if username.strip() != "" and password.strip() != "":
         if username not in UserData:
             UserData[username] = password
-            # messagebox.showinfo("Auth successful!","Welcome!")
         else:
-            messagebox.showerror("Error","User exist!")
+            messagebox.showerror("Error", "User exists!")
             username_entry.delete(0, tk.END)
             password_entry.delete(0, tk.END)
             return False
@@ -67,32 +62,43 @@ root.configure(bg="#ADE1E7")
 # Add a title label
 welcome_text = "Welcome!\nAre you ready to conquer the day? 😊"
 title_label = ttk.Label(root, text=welcome_text, anchor="center", font=("Helvetica", 20, "bold"), background="#ADE1E7", justify="center")
-title_label.grid(row=0, column=0, columnspan=2, pady=20, padx=20)
+title_label.place(relx=0.5, rely=0.1, anchor="center")
 
-# Create and place username label and entry
+# Create and place username label and entry (on the same line)
 username_label = ttk.Label(root, text="Username:", anchor="center", font=("Helvetica", 14, "bold"), background="#ADE1E7")
-username_label.grid(row=1, column=0, sticky="e", pady=10, padx=20)
+username_label.place(relx=0.3, rely=0.35, anchor="center")
 
 username_entry = tk.Entry(root, width=25, font=("Helvetica", 14), bg="#E1E3F0")
-username_entry.grid(row=1, column=1, pady=10, padx=20)
+username_entry.place(relx=0.65, rely=0.35, anchor="center")
 
-# Create and place password label and entry
+# Create and place password label and entry (on the same line)
 password_label = ttk.Label(root, text="Password:", anchor="center", font=("Helvetica", 14, "bold"), background="#ADE1E7")
-password_label.grid(row=2, column=0, sticky="e", pady=10, padx=20)
+password_label.place(relx=0.3, rely=0.45, anchor="center")
 
 password_entry = tk.Entry(root, show="*", width=25, font=("Helvetica", 14), bg="#E1E3F0")
-password_entry.grid(row=2, column=1, pady=10, padx=20)
+password_entry.place(relx=0.65, rely=0.45, anchor="center")
 
 # Bind Enter key to login function
 password_entry.bind("<Return>", lambda event: validate_login())
 
+# Create a style for buttons with matching text and background colors
+style = ttk.Style()
+style.configure("TButton",
+                font=("Helvetica", 14, "bold"),
+                foreground="black",  # Darker text color (darker shade of #ADE1E7)
+                background="#60B9D4",  # Button background color
+                borderwidth=2,         # Small border
+                relief="solid",        # Solid border style
+                anchor="center",       # Align text in the center
+                padding=10)            # Padding inside button to help with alignment
+
 # Create and place login button
 login_button = ttk.Button(root, text="Login", command=validate_login, style="TButton")
-login_button.grid(row=3, column=0, columnspan=2, pady=20)
+login_button.place(relx=0.3, rely=0.6, width=220, height=40, anchor="center")
 
-# Create and place "Create new account" button
+# Create and place "Create new account" button next to the login button
 auth_button = ttk.Button(root, text="Create new account", command=add_user, style="TButton")
-auth_button.grid(row=4, column=0, columnspan=2, pady=20)
+auth_button.place(relx=0.7, rely=0.6, width=220, height=40, anchor="center")
 
 # Start the main event loop
 root.mainloop()

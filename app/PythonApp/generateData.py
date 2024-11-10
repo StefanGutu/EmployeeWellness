@@ -8,7 +8,7 @@ import asyncio
 class RandomNumberGenerator:
     def __init__(self):
         # Define the sequence
-        self.sequence = [1, 1, 1, 2, 3, 0, 0]
+        self.sequence = [0, 3, 0, 2, 0, 3, 3, 0, 0, 3, 0, 1, 0, 2, 0, 0, 0, 3, 0, 2, 0, 3, 1, 0, 0, 3, 0, 1, 0, 2, 0, 0]
         self.index = 0  # Initialize the counter to track the position in the sequence
 
     def generate_random_number(self):

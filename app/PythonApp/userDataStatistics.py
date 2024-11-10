@@ -24,8 +24,6 @@ def open_data_statistics(user_id, old_root):
     root.geometry(f"{width}x{height}+{x_pos}+{y_pos}")
     root.configure(bg="#ADE1E7")
 
-    # Variabilă pentru a stoca procentele
-    latest_percentages = {}
 
     # Funcția pentru afișarea statisticilor totale
     def show_total_statistics():
@@ -69,13 +67,6 @@ def open_data_statistics(user_id, old_root):
         percentage_2 = (count_2 / total) * 100
         percentage_3 = (count_3 / total) * 100
 
-        # Stocăm procentele în dicționarul latest_percentages
-        latest_percentages.update({
-            'Head': percentage_1,
-            'Shoulders': percentage_2,
-            'Close to Monitor': percentage_3
-        })
-
         counts = [count_1, count_2, count_3]
         fig, ax = plt.subplots(figsize=(8, 6))
         colors = ['red', 'green', 'blue']
@@ -93,6 +84,21 @@ def open_data_statistics(user_id, old_root):
         popup = tk.Toplevel(root)
         popup.title("Recomandations")
         
+        values = dataBaseCode.get_latest_numbers(user_id)
+        
+        if not values:
+            print("Nu au fost găsite valori pentru acest utilizator.")
+            return
+
+        numbers = [row[0] for row in values]
+        count_1 = numbers.count(1)
+        count_2 = numbers.count(2)
+        count_3 = numbers.count(3)
+        total = len(values)
+        percentage_1 = (count_1 / total) * 100
+        percentage_2 = (count_2 / total) * 100
+        percentage_3 = (count_3 / total) * 100
+        
         popup_width = 600
         popup_height = 450
         x_pos = (screen_width - popup_width) // 2
@@ -104,9 +110,9 @@ def open_data_statistics(user_id, old_root):
         recommendation_label = ttk.Label(
             popup, 
             text="Here are some recommendations based on your data.\n\n"
-                 f"Head Position: {latest_percentages.get('Head', 0):.1f}%\n"
-                 f"Shoulders Position: {latest_percentages.get('Shoulders', 0):.1f}%\n"
-                 f"Head Posture: {latest_percentages.get('Close to Monitor', 0):.1f}%\n\n"
+                 f"Head Position: {percentage_1}%\n"
+                 f"Shoulders Position: {percentage_2}%\n"
+                 f"Head Posture: {percentage_3}%\n\n"
                  "Follow these suggestions for better health and comfort.😊",
             font=("Helvetica", 14,"bold"), 
             background="#ADE1E7",

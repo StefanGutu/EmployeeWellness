@@ -43,6 +43,7 @@ def open_data_statistics(user_id, old_root):
         ax.bar(categories, values, color=colors)
         ax.set_xlabel('Categories', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_ylabel('Total receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
+        ax.set_ylabel('Total receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_title('Total Statistics', fontsize=14, fontweight='bold', color='darkgreen', pad=20)
         ax.set_ylim(0, 100)
         ax.set_xticks(np.arange(len(categories)))
@@ -51,7 +52,10 @@ def open_data_statistics(user_id, old_root):
 
     # Funcția pentru afișarea ultimelor statistici
     def show_latest_statistics():
+        # Categoriile pentru care vrem să calculăm procentele
         categories = ['Head', 'Shoulders', 'Close to Monitor']
+
+        # Obținem valorile din baza de date (aici se presupune că ai funcția care le aduce corect)
         values = dataBaseCode.get_latest_numbers(user_id)
         
         if not values:
@@ -74,6 +78,7 @@ def open_data_statistics(user_id, old_root):
         for i, (count, percentage) in enumerate(zip(counts, [percentage_1, percentage_2, percentage_3])):
             ax.text(i, count + 0.2, f'{percentage:.1f}%', ha='center', fontsize=9, fontweight='bold', color='black')
         ax.set_xlabel('Categories', fontsize=12, fontweight='bold', color='blue', labelpad=15)
+        ax.set_ylabel('Recent receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_ylabel('Recent receive data', fontsize=12, fontweight='bold', color='blue', labelpad=15)
         ax.set_title('Latest Statistics', fontsize=14, fontweight='bold', color='darkgreen', pad=20)
         ax.set_ylim(0, max(counts) + 2)

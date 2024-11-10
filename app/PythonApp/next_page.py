@@ -98,10 +98,12 @@ def open_next_page(username, root):
         try:
             value = int(my_val.get())
 
-            # Handle warnings for values 1, 2, or 3
-            if value in {1, 2, 3}:
+            # Handle warnings for values -1, 1, 2, or 3
+            if value in {-1, 1, 2, 3}:
                 # Send notification based on value
                 match value:
+                    case -1:
+                        notification.send_notification("Take a break!", "You are sitting to much in front of your computer! Consider taking a break")
                     case 1:
                         dataBaseCode.increment_signal(user_id,"head_signal")
                         dataBaseCode.add_number_to_database(user_id,1)
